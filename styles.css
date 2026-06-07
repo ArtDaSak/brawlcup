@@ -374,6 +374,9 @@ iconify-icon {
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.03);
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .nav a:hover {
@@ -1048,6 +1051,36 @@ table tr:hover td {
     grid-template-columns: 1fr;
   }
 
+  .hero {
+    padding: 24px 20px;
+    gap: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.8rem, 8vw, 2.5rem);
+    line-height: 1.1;
+  }
+
+  .hero p {
+    font-size: 0.95rem;
+    margin-bottom: 0;
+  }
+
+  .prize-card {
+    min-height: auto;
+    padding: 16px;
+    gap: 1rem;
+    border-radius: 18px;
+  }
+
+  .prize-card iconify-icon {
+    font-size: 3.5rem;
+  }
+
+  .prize-card strong {
+    font-size: 2.2rem;
+  }
+
   .half {
     grid-column: span 12;
   }
@@ -1137,3 +1170,37 @@ table tr:hover td {
     width: 120px;
   }
 }
+
+/* Estilos de Pestaña Activa y Transición Premium */
+.nav a.active {
+  border-color: var(--cyan) !important;
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.18), rgba(0, 102, 255, 0.12)) !important;
+  box-shadow: inset 0 0 10px rgba(0, 242, 254, 0.2), var(--glow-cyan) !important;
+  color: #fff !important;
+  font-weight: 900;
+  text-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ocultar todas las secciones por defecto en celular y computadora */
+.grid > section {
+  display: none !important;
+}
+/* Mostrar únicamente la sección activa con animación de entrada */
+.grid > section.active {
+  display: block !important;
+  grid-column: span 12 !important;
+  animation: tabFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+

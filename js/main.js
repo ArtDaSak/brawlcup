@@ -11,6 +11,8 @@ import {
   loadTournamentFromMockApi
 } from "./api.js";
 
+import "./navigation.js";
+
 const LOCAL_KEY = "copa_brawl_sports_duos_state";
 const REMOTE_ID_KEY = "copa_brawl_sports_duos_remote_id";
 
