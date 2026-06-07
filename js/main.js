@@ -270,6 +270,9 @@ function renderStandings() {
           <strong>${escapeHtml(row.name)}</strong>
           <br>
           <small class="muted">${escapeHtml(row.memberOne)} + ${escapeHtml(row.memberTwo)}</small>
+          <div class="mobile-stats-summary">
+            V: ${row.wins} · D: ${row.losses} · Desc: ${row.byes} · Ext: +${row.extraPoints} · Esp: ${row.specialActions}
+          </div>
         </td>
         <td class="cyan">${row.points}</td>
         <td class="green">${row.wins}</td>

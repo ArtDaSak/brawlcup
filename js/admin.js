@@ -36,6 +36,7 @@ window.App = {
   addTeam: handleAddTeam,
   removeTeam: handleRemoveTeam,
   updateRoundSchedule: handleUpdateRoundSchedule,
+  updateRoundDateTime: handleUpdateRoundDateTime,
   drawRoundOneBye: handleDrawRoundOneBye,
   resetRoundOneDraw: handleResetRoundOneDraw,
   generateNextRound: handleGenerateNextRound,
@@ -43,6 +44,8 @@ window.App = {
   updateWinner: handleUpdateWinner,
   updatePerfect: handleUpdatePerfect,
   updateStat: handleUpdateStat,
+  decrementStat: handleDecrementStat,
+  incrementStat: handleIncrementStat,
   createRemoteTournament: handleCreateRemoteTournament,
   loadRemoteFromInput: handleLoadRemoteFromInput,
   saveRemoteNow: handleSaveRemoteNow
@@ -150,6 +153,32 @@ function handleRemoveTeam(teamId) {
 function handleUpdateRoundSchedule(roundNumber, field, value) {
   updateRoundSchedule(tournament, roundNumber, field, value);
   commit();
+}
+
+function handleUpdateRoundDateTime(roundNumber, datetimeValue) {
+  if (!datetimeValue) {
+    updateRoundSchedule(tournament, roundNumber, 'date', '');
+    updateRoundSchedule(tournament, roundNumber, 'time', '');
+  } else {
+    const [date, time] = datetimeValue.split('T');
+    updateRoundSchedule(tournament, roundNumber, 'date', date);
+    updateRoundSchedule(tournament, roundNumber, 'time', time || '00:00');
+  }
+  commit();
+}
+
+function handleDecrementStat(roundId, matchId, teamId, statKey) {
+  const match = tournament.rounds.find(r => r.id === roundId)?.matches.find(m => m.id === matchId);
+  if (!match || match.type === "bye") return;
+  const current = Number(match.stats[teamId]?.[statKey] || 0);
+  handleUpdateStat(roundId, matchId, teamId, statKey, Math.max(0, current - 1));
+}
+
+function handleIncrementStat(roundId, matchId, teamId, statKey) {
+  const match = tournament.rounds.find(r => r.id === roundId)?.matches.find(m => m.id === matchId);
+  if (!match || match.type === "bye") return;
+  const current = Number(match.stats[teamId]?.[statKey] || 0);
+  handleUpdateStat(roundId, matchId, teamId, statKey, Math.min(9, current + 1));
 }
 
 function handleDrawRoundOneBye() {
@@ -308,6 +337,8 @@ function renderSchedule() {
             ? "mdi:basketball"
             : "mdi:soccer";
 
+      const dateTimeVal = round.date ? `${round.date}T${round.time || "00:00"}` : "";
+
       return `
         <article class="schedule-card">
           <header>
@@ -319,21 +350,22 @@ function renderSchedule() {
           </header>
 
           <label>
-            Fecha
-            <input
-              type="date"
-              value="${escapeHtml(round.date)}"
-              onchange="App.updateRoundSchedule(${round.number}, 'date', this.value)"
-            >
-          </label>
-
-          <label>
-            Hora
-            <input
-              type="time"
-              value="${escapeHtml(round.time)}"
-              onchange="App.updateRoundSchedule(${round.number}, 'time', this.value)"
-            >
+            Fecha y Hora
+            <div class="datetime-input-container">
+              <input
+                type="datetime-local"
+                value="${dateTimeVal}"
+                onchange="App.updateRoundDateTime(${round.number}, this.value)"
+                onclick="this.showPicker?.()"
+              >
+              <div class="datetime-display">
+                ${round.date
+                  ? `<span><iconify-icon icon="mdi:calendar"></iconify-icon> ${formatDate(round.date, '')} ${round.time ? `· <iconify-icon icon="mdi:clock-outline"></iconify-icon> ${round.time}` : ''}</span>`
+                  : `<span class="placeholder"><iconify-icon icon="mdi:calendar-plus"></iconify-icon> Definir fecha y hora</span>`
+                }
+                <iconify-icon icon="mdi:chevron-down" style="font-size: 1.1rem; color: var(--muted);"></iconify-icon>
+              </div>
+            </div>
           </label>
 
           <label>
@@ -495,6 +527,9 @@ function renderStandings() {
           <strong>${escapeHtml(row.name)}</strong>
           <br>
           <small class="muted">${escapeHtml(row.memberOne)} + ${escapeHtml(row.memberTwo)}</small>
+          <div class="mobile-stats-summary">
+            V: ${row.wins} · D: ${row.losses} · Desc: ${row.byes} · Ext: +${row.extraPoints} · Esp: ${row.specialActions}
+          </div>
         </td>
         <td class="cyan">${row.points}</td>
         <td class="green">${row.wins}</td>
@@ -596,33 +631,27 @@ function renderMatch(round, match) {
           <div class="stat-fields">
             <label>
               Trick
-              <input
-                type="number"
-                min="0"
-                max="9"
-                value="${statsA.trickOrThreeRebounds}"
-                onchange="App.updateStat('${round.id}', '${match.id}', '${match.teamAId}', 'trickOrThreeRebounds', this.value)"
-              >
+              <div class="stepper">
+                <button type="button" class="stepper-btn" onclick="App.decrementStat('${round.id}', '${match.id}', '${match.teamAId}', 'trickOrThreeRebounds')">-</button>
+                <span class="stepper-val">${statsA.trickOrThreeRebounds}</span>
+                <button type="button" class="stepper-btn" onclick="App.incrementStat('${round.id}', '${match.id}', '${match.teamAId}', 'trickOrThreeRebounds')">+</button>
+              </div>
             </label>
             <label>
               Infil
-              <input
-                type="number"
-                min="0"
-                max="9"
-                value="${statsA.infiltration}"
-                onchange="App.updateStat('${round.id}', '${match.id}', '${match.teamAId}', 'infiltration', this.value)"
-              >
+              <div class="stepper">
+                <button type="button" class="stepper-btn" onclick="App.decrementStat('${round.id}', '${match.id}', '${match.teamAId}', 'infiltration')">-</button>
+                <span class="stepper-val">${statsA.infiltration}</span>
+                <button type="button" class="stepper-btn" onclick="App.incrementStat('${round.id}', '${match.id}', '${match.teamAId}', 'infiltration')">+</button>
+              </div>
             </label>
             <label>
               Pase+A
-              <input
-                type="number"
-                min="0"
-                max="9"
-                value="${statsA.passAndScore}"
-                onchange="App.updateStat('${round.id}', '${match.id}', '${match.teamAId}', 'passAndScore', this.value)"
-              >
+              <div class="stepper">
+                <button type="button" class="stepper-btn" onclick="App.decrementStat('${round.id}', '${match.id}', '${match.teamAId}', 'passAndScore')">-</button>
+                <span class="stepper-val">${statsA.passAndScore}</span>
+                <button type="button" class="stepper-btn" onclick="App.incrementStat('${round.id}', '${match.id}', '${match.teamAId}', 'passAndScore')">+</button>
+              </div>
             </label>
           </div>
           <div class="extra-preview">Extra: +${calculateTeamExtra(statsA)} pts</div>
@@ -635,33 +664,27 @@ function renderMatch(round, match) {
           <div class="stat-fields">
             <label>
               Trick
-              <input
-                type="number"
-                min="0"
-                max="9"
-                value="${statsB.trickOrThreeRebounds}"
-                onchange="App.updateStat('${round.id}', '${match.id}', '${match.teamBId}', 'trickOrThreeRebounds', this.value)"
-              >
+              <div class="stepper">
+                <button type="button" class="stepper-btn" onclick="App.decrementStat('${round.id}', '${match.id}', '${match.teamBId}', 'trickOrThreeRebounds')">-</button>
+                <span class="stepper-val">${statsB.trickOrThreeRebounds}</span>
+                <button type="button" class="stepper-btn" onclick="App.incrementStat('${round.id}', '${match.id}', '${match.teamBId}', 'trickOrThreeRebounds')">+</button>
+              </div>
             </label>
             <label>
               Infil
-              <input
-                type="number"
-                min="0"
-                max="9"
-                value="${statsB.infiltration}"
-                onchange="App.updateStat('${round.id}', '${match.id}', '${match.teamBId}', 'infiltration', this.value)"
-              >
+              <div class="stepper">
+                <button type="button" class="stepper-btn" onclick="App.decrementStat('${round.id}', '${match.id}', '${match.teamBId}', 'infiltration')">-</button>
+                <span class="stepper-val">${statsB.infiltration}</span>
+                <button type="button" class="stepper-btn" onclick="App.incrementStat('${round.id}', '${match.id}', '${match.teamBId}', 'infiltration')">+</button>
+              </div>
             </label>
             <label>
               Pase+A
-              <input
-                type="number"
-                min="0"
-                max="9"
-                value="${statsB.passAndScore}"
-                onchange="App.updateStat('${round.id}', '${match.id}', '${match.teamBId}', 'passAndScore', this.value)"
-              >
+              <div class="stepper">
+                <button type="button" class="stepper-btn" onclick="App.decrementStat('${round.id}', '${match.id}', '${match.teamBId}', 'passAndScore')">-</button>
+                <span class="stepper-val">${statsB.passAndScore}</span>
+                <button type="button" class="stepper-btn" onclick="App.incrementStat('${round.id}', '${match.id}', '${match.teamBId}', 'passAndScore')">+</button>
+              </div>
             </label>
           </div>
           <div class="extra-preview">Extra: +${calculateTeamExtra(statsB)} pts</div>

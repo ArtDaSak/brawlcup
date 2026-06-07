@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap');
 
 :root {
+  color-scheme: dark;
   --bg: #03050d;
   --panel: rgba(8, 12, 28, 0.7);
   --panel-2: rgba(15, 23, 48, 0.85);
@@ -127,6 +128,25 @@ input:focus, select:focus, textarea:focus {
   border-color: var(--cyan);
   box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.15), var(--glow-cyan);
   background: rgba(2, 6, 23, 0.6);
+}
+
+input[type="date"],
+input[type="time"] {
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 4px;
+  transition: all 0.2s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  background: rgba(0, 242, 254, 0.15);
+  filter: drop-shadow(0 0 4px var(--cyan));
 }
 
 label {
@@ -896,14 +916,134 @@ table tr:hover td {
   text-shadow: 0 0 5px rgba(0, 242, 254, 0.3);
 }
 
+/* Custom Date-Time Picker Overlay */
+.datetime-input-container {
+  position: relative;
+  width: 100%;
+  min-height: 48px;
+}
+
+.datetime-input-container input[type="datetime-local"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+}
+
+.datetime-display {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .78rem .85rem;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 14px;
+  background: rgba(2, 6, 23, 0.45);
+  color: var(--text);
+  pointer-events: none;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.datetime-display span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.datetime-display .placeholder {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.datetime-input-container input[type="datetime-local"]:focus ~ .datetime-display {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.15), var(--glow-cyan);
+  background: rgba(2, 6, 23, 0.65);
+}
+
+.datetime-input-container:hover .datetime-display {
+  border-color: rgba(139, 92, 246, 0.45);
+  background: rgba(139, 92, 246, 0.06);
+}
+
+/* Custom Stepper Controls */
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  height: 38px;
+  margin-top: 0.2rem;
+  transition: border-color 0.2s ease;
+}
+
+.stepper:focus-within {
+  border-color: var(--cyan);
+}
+
+.stepper-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 100%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-weight: 900;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0;
+}
+
+.stepper-btn:hover {
+  background: rgba(0, 242, 254, 0.15);
+  color: var(--cyan);
+  transform: none !important;
+}
+
+.stepper-btn:active {
+  background: rgba(0, 242, 254, 0.3);
+}
+
+.stepper-val {
+  flex: 1;
+  text-align: center;
+  font-weight: 900;
+  font-size: 0.95rem;
+  color: var(--cyan);
+  user-select: none;
+}
+
+.mobile-stats-summary {
+  display: none;
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+  line-height: 1.35;
+}
+
 @media(max-width:900px){
   .hero,
   .connection-grid,
   .form-row,
   .schedule-grid,
   .mode-row,
-  .rules-grid,
-  .match-map,
   .stats-grid{
     grid-template-columns: 1fr;
   }
@@ -924,12 +1064,76 @@ table tr:hover td {
     text-align: center;
   }
 
+  .nav {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Compact Rules Grid (2 columns on mobile instead of 1 vertical row) */
+  .rules-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+
+  /* Horizontally Swipeable Match Map with Scroll Snap (app-like feel) */
+  .match-map {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1.2rem;
+    padding: 0.5rem 0.2rem 1.5rem;
+    margin: 0 -0.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  
+  .match-map::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .round-column {
+    flex: 0 0 85vw;
+    scroll-snap-align: center;
+    box-sizing: border-box;
+  }
+
+  /* Compact responsive standings table */
   table {
     font-size: .84rem;
   }
 
-  th:nth-child(4), td:nth-child(4),
-  th:nth-child(7), td:nth-child(7) {
+  th:nth-child(4), td:nth-child(4), /* wins */
+  th:nth-child(5), td:nth-child(5), /* losses */
+  th:nth-child(6), td:nth-child(6), /* byes */
+  th:nth-child(7), td:nth-child(7), /* extra */
+  th:nth-child(8), td:nth-child(8)  /* special */ {
     display: none;
+  }
+
+  .mobile-stats-summary {
+    display: block;
+  }
+
+  .stat-fields {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .stat-fields label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.82rem;
+  }
+
+  .stat-fields .stepper {
+    margin-top: 0;
+    width: 120px;
   }
 }
