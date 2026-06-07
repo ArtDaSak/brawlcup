@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Administración - Copa Brawl Sports Dúos</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <section>
+        <div class="kicker">
+          <iconify-icon icon="mdi:cog"></iconify-icon>
+          Panel de Administración
+        </div>
+
+        <h1>
+          Copa<br>
+          <span>Brawl Sports</span><br>
+          <strong>Dúos</strong>
+        </h1>
+
+        <p>
+          Panel exclusivo para registrar dúos, sortear descansos, gestionar enfrentamientos,
+          introducir marcadores y sincronizar el estado del torneo en MockAPI.
+        </p>
+
+        <div class="hero-actions">
+          <button onclick="App.generateNextRound()">
+            <iconify-icon icon="mdi:plus-circle"></iconify-icon>
+            Crear siguiente ronda
+          </button>
+
+          <button class="secondary" onclick="App.saveRemoteNow()">
+            <iconify-icon icon="mdi:cloud-upload"></iconify-icon>
+            Guardar en MockAPI
+          </button>
+
+          <a href="../index.html" style="text-decoration: none;">
+            <button class="ghost">
+              <iconify-icon icon="mdi:eye"></iconify-icon>
+              Ver Vista Pública
+            </button>
+          </a>
+        </div>
+      </section>
+
+      <aside class="prize-card">
+        <iconify-icon icon="mdi:ticket-confirmation"></iconify-icon>
+        <div>
+          <span>Premio final</span>
+          <strong>2 pases</strong>
+          <p>1 para cada integrante del dúo ganador</p>
+        </div>
+      </aside>
+    </header>
+
+    <nav class="nav">
+      <a href="#conexion">Conexión</a>
+      <a href="#calendario">Calendario</a>
+      <a href="#equipos">Equipos</a>
+      <a href="#sorteo">Sorteo</a>
+      <a href="#mapa">Mapa</a>
+      <a href="#tabla">Tabla</a>
+      <a href="../index.html" style="margin-left: auto; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: var(--text);">Vista Pública</a>
+    </nav>
+
+    <main class="grid">
+      <section class="card full" id="conexion">
+        <div class="section-head">
+          <h2><span>1</span>Conexión con MockAPI</h2>
+          <small id="syncStatus">Sin sincronizar</small>
+        </div>
+
+        <div class="connection-grid">
+          <div>
+            <p class="muted">
+              Configura la URL en <code>js/config.js</code>. Luego puedes crear un torneo nuevo
+              o cargar uno existente usando su ID de MockAPI
+            </p>
+
+            <div class="form-row">
+              <label>
+                ID del torneo en MockAPI
+                <input id="remoteIdInput" placeholder="Ej: 1">
+              </label>
+
+              <button onclick="App.loadRemoteFromInput()">
+                <iconify-icon icon="mdi:cloud-download"></iconify-icon>
+                Cargar
+              </button>
+
+              <button class="secondary" onclick="App.createRemoteTournament()">
+                <iconify-icon icon="mdi:database-plus"></iconify-icon>
+                Crear torneo
+              </button>
+            </div>
+          </div>
+
+          <div class="mini-panel">
+            <strong>Estado actual</strong>
+            <p id="remoteInfo">Trabajando localmente</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card full" id="calendario">
+        <div class="section-head">
+          <h2><span>2</span>Calendario de rondas</h2>
+        </div>
+
+        <div id="roundSchedule" class="schedule-grid"></div>
+      </section>
+
+      <section class="card half" id="equipos">
+        <div class="section-head">
+          <h2><span>3</span>Equipos</h2>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            Nombre del dúo
+            <input id="teamName" placeholder="Ej: Los Rebotes">
+          </label>
+
+          <label>
+            Integrante 1
+            <input id="memberOne" placeholder="Nombre jugador 1">
+          </label>
+
+          <label>
+            Integrante 2
+            <input id="memberTwo" placeholder="Nombre jugador 2">
+          </label>
+
+          <label>
+            Notas / contacto
+            <input id="teamNotes" placeholder="Opcional">
+          </label>
+
+          <button onclick="App.addTeam()">
+            <iconify-icon icon="mdi:account-group"></iconify-icon>
+            Registrar dúo
+          </button>
+        </div>
+
+        <div id="teamsList" class="stack"></div>
+      </section>
+
+      <section class="card half" id="sorteo">
+        <div class="section-head">
+          <h2><span>4</span>Sorteo de descanso</h2>
+        </div>
+
+        <div class="draw-box">
+          <iconify-icon icon="mdi:dice-multiple"></iconify-icon>
+          <div>
+            <strong>Descanso de Ronda 1</strong>
+            <p>
+              Si hay equipos impares, se sortea automáticamente el dúo que descansa
+              antes de crear los enfrentamientos
+            </p>
+          </div>
+        </div>
+
+        <div class="draw-actions">
+          <button onclick="App.drawRoundOneBye()">
+            <iconify-icon icon="mdi:dice-5"></iconify-icon>
+            Sortear descanso
+          </button>
+
+          <button class="ghost" onclick="App.resetRoundOneDraw()">
+            Reiniciar sorteo
+          </button>
+        </div>
+
+        <div id="drawResult" class="stack"></div>
+      </section>
+
+      <section class="card full" id="mapa">
+        <div class="section-head">
+          <h2><span>5</span>Mapa de enfrentamientos</h2>
+
+          <div class="actions">
+            <button onclick="App.generateNextRound()">
+              Crear siguiente ronda
+            </button>
+
+            <button class="danger" onclick="App.resetRounds()">
+              Borrar rondas
+            </button>
+          </div>
+        </div>
+
+        <p class="muted">
+          Ronda 1: aleatoria. Rondas 2 y 3: por puntaje similar, evitando repetir rivales si es posible
+        </p>
+
+        <div id="matchMap" class="match-map"></div>
+      </section>
+
+      <section class="card full" id="tabla">
+        <div class="section-head">
+          <h2><span>6</span>Tabla de posiciones</h2>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Dúo</th>
+                <th>Pts</th>
+                <th>Victorias</th>
+                <th>Derrotas</th>
+                <th>Descansos</th>
+                <th>Extra</th>
+                <th>Anot. especiales</th>
+              </tr>
+            </thead>
+            <tbody id="standingsTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module" src="../js/admin.js"></script>
+</body>
+</html>

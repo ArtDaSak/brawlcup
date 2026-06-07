@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Copa Brawl Sports Dúos</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <section>
+        <div class="kicker">
+          <iconify-icon icon="mdi:trophy"></iconify-icon>
+          Liga Express · Dúos
+        </div>
+
+        <h1>
+          Copa<br>
+          <span>Brawl Sports</span><br>
+          <strong>Dúos</strong>
+        </h1>
+
+        <p>
+          Sistema para registrar equipos, calendario de rondas, enfrentamientos, puntos,
+          descansos por sorteo y tabla final.
+        </p>
+      </section>
+
+      <aside class="prize-card">
+        <iconify-icon icon="mdi:ticket-confirmation"></iconify-icon>
+        <div>
+          <span>Premio final</span>
+          <strong>2 pases</strong>
+          <p>1 para cada integrante del dúo ganador</p>
+        </div>
+      </aside>
+    </header>
+
+    <nav class="nav">
+      <a href="#reglas">Reglas</a>
+      <a href="#calendario">Calendario</a>
+      <a href="#equipos">Equipos</a>
+      <a href="#sorteo">Sorteo</a>
+      <a href="#mapa">Mapa</a>
+      <a href="#tabla">Tabla</a>
+    </nav>
+
+    <main class="grid">
+      <section class="card full" id="reglas">
+        <div class="section-head">
+          <h2><span>1</span>Reglas oficiales</h2>
+        </div>
+
+        <div class="mode-row">
+          <article>
+            <iconify-icon icon="mdi:hockey-puck"></iconify-icon>
+            <small>Ronda 1</small>
+            <strong>Hockey Brawl</strong>
+          </article>
+
+          <article>
+            <iconify-icon icon="mdi:basketball"></iconify-icon>
+            <small>Ronda 2</small>
+            <strong>Basket Brawl</strong>
+          </article>
+
+          <article>
+            <iconify-icon icon="mdi:soccer"></iconify-icon>
+            <small>Ronda 3</small>
+            <strong>Balón Brawl</strong>
+          </article>
+        </div>
+
+        <div class="rules-grid">
+          <article>
+            <iconify-icon icon="mdi:trophy"></iconify-icon>
+            <small>Victoria</small>
+            <strong>+5 pts</strong>
+          </article>
+
+          <article>
+            <iconify-icon icon="mdi:close-octagon"></iconify-icon>
+            <small>Derrota</small>
+            <strong>0 pts</strong>
+          </article>
+
+          <article>
+            <iconify-icon icon="mdi:sofa"></iconify-icon>
+            <small>Descanso oficial</small>
+            <strong>+3 pts</strong>
+            <p>No cuenta como victoria</p>
+          </article>
+
+          <article>
+            <iconify-icon icon="mdi:star-circle"></iconify-icon>
+            <small>Victoria perfecta</small>
+            <strong>+1 pt</strong>
+            <p>Sin recibir gol, canasta o punto</p>
+          </article>
+
+          <article>
+            <iconify-icon icon="mdi:target"></iconify-icon>
+            <small>Trick shot o 3+ rebotes</small>
+            <strong>+2 pts</strong>
+          </article>
+
+          <article>
+            <iconify-icon icon="mdi:run-fast"></iconify-icon>
+            <small>Infiltración</small>
+            <strong>+1 pt</strong>
+            <p>Anotar lanzando, no entrando a fuerza bruta</p>
+          </article>
+
+          <article>
+            <iconify-icon icon="mdi:account-arrow-right"></iconify-icon>
+            <small>Pase + anotación</small>
+            <strong>+1 pt</strong>
+          </article>
+
+          <article>
+            <iconify-icon icon="mdi:shield-alert"></iconify-icon>
+            <small>Límite extra</small>
+            <strong>+4 pts</strong>
+            <p>Máximo por dúo en cada ronda</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="card full" id="calendario">
+        <div class="section-head">
+          <h2><span>2</span>Calendario de rondas</h2>
+        </div>
+
+        <div id="roundSchedule" class="schedule-grid"></div>
+      </section>
+
+      <section class="card half" id="equipos">
+        <div class="section-head">
+          <h2><span>3</span>Equipos</h2>
+        </div>
+
+        <div id="teamsList" class="stack"></div>
+      </section>
+
+      <section class="card half" id="sorteo">
+        <div class="section-head">
+          <h2><span>4</span>Sorteo de descanso</h2>
+        </div>
+
+        <div class="draw-box">
+          <iconify-icon icon="mdi:dice-multiple"></iconify-icon>
+          <div>
+            <strong>Descanso de Ronda 1</strong>
+            <p>
+              Si hay equipos impares, muestra el dúo que descansa y el código del sorteo.
+            </p>
+          </div>
+        </div>
+
+        <div id="drawResult" class="stack"></div>
+      </section>
+
+      <section class="card full" id="mapa">
+        <div class="section-head">
+          <h2><span>5</span>Mapa de enfrentamientos</h2>
+        </div>
+
+        <p class="muted">
+          Ronda 1: aleatoria. Rondas 2 y 3: por puntaje similar, evitando repetir rivales si es posible.
+        </p>
+
+        <div id="matchMap" class="match-map"></div>
+      </section>
+
+      <section class="card full" id="tabla">
+        <div class="section-head">
+          <h2><span>6</span>Tabla de posiciones</h2>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Dúo</th>
+                <th>Pts</th>
+                <th>Victorias</th>
+                <th>Derrotas</th>
+                <th>Descansos</th>
+                <th>Extra</th>
+                <th>Anot. especiales</th>
+              </tr>
+            </thead>
+            <tbody id="standingsTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
