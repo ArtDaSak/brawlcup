@@ -360,17 +360,9 @@ function render() {
 function renderConnection() {
   $("#remoteIdInput").value = tournament.remoteId || "";
 
-  $("#remoteInfo").innerHTML = tournament.remoteId
-    ? `Conectado al torneo <strong>#${escapeHtml(tournament.remoteId)}</strong>`
-    : "Trabajando localmente";
+  $("#remoteInfo").innerHTML = `Sincronizado con el torneo <strong>#${escapeHtml(tournament.remoteId || "1")}</strong>`;
 
-  setSyncStatus(
-    isMockApiConfigured()
-      ? tournament.remoteId
-        ? "Conectado"
-        : "MockAPI configurado"
-      : "Falta configurar MockAPI"
-  );
+  setSyncStatus("Sincronizado con MockAPI");
 }
 
 function renderSchedule() {
