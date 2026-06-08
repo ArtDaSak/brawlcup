@@ -60,16 +60,28 @@ window.App = {
 
 init();
 
+window.addEventListener("storage", (e) => {
+  if (e.key === LOCAL_KEY) {
+    tournament = loadLocalTournament();
+    render();
+  }
+});
+
 async function init() {
   const configuredId =
     CONFIG.TOURNAMENT_ID || localStorage.getItem(REMOTE_ID_KEY) || "";
 
+  if (configuredId) {
+    tournament.remoteId = configuredId;
+    localStorage.setItem(REMOTE_ID_KEY, configuredId);
+    saveLocal();
+  }
+
   if (configuredId && isMockApiConfigured()) {
     try {
       setSyncStatus("Cargando...");
-      tournament = hydrateTournament(
-        await loadTournamentFromMockApi(configuredId)
-      );
+      const remote = await loadTournamentFromMockApi(configuredId);
+      tournament = hydrateTournament(remote);
 
       localStorage.setItem(REMOTE_ID_KEY, tournament.remoteId);
       saveLocal();

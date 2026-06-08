@@ -1,4 +1,5 @@
 import { CONFIG } from "./config.js";
+import { createDefaultTournament } from "./tournament.js";
 
 function cleanBaseUrl() {
   return CONFIG.MOCKAPI_BASE_URL.replace(/\/+$/, "");
@@ -25,14 +26,23 @@ function packTournament(tournament) {
 }
 
 function unpackTournament(record) {
-  if (!record || !record.payload) {
-    throw new Error("El registro no tiene payload");
+  if (!record) {
+    throw new Error("El registro es nulo o inválido");
   }
 
-  const tournament = JSON.parse(record.payload);
+  let tournamentData;
+  if (!record.payload) {
+    tournamentData = createDefaultTournament();
+  } else {
+    try {
+      tournamentData = JSON.parse(record.payload);
+    } catch {
+      tournamentData = createDefaultTournament();
+    }
+  }
 
   return {
-    ...tournament,
+    ...tournamentData,
     remoteId: record.id
   };
 }

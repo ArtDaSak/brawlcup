@@ -22,6 +22,13 @@ const $ = (selector) => document.querySelector(selector);
 
 init();
 
+window.addEventListener("storage", (e) => {
+  if (e.key === LOCAL_KEY) {
+    tournament = loadLocalTournament();
+    render();
+  }
+});
+
 async function init() {
   // Primero cargamos de localStorage
   tournament = loadLocalTournament();
@@ -31,6 +38,11 @@ async function init() {
     CONFIG.TOURNAMENT_ID || localStorage.getItem(REMOTE_ID_KEY) || "";
 
   if (configuredId && isMockApiConfigured()) {
+    if (tournament.remoteId !== configuredId) {
+      tournament.remoteId = configuredId;
+      saveLocal();
+    }
+
     try {
       setSyncStatus("Sincronizando...");
       const remote = await loadTournamentFromMockApi(configuredId);
@@ -44,7 +56,27 @@ async function init() {
       setSyncStatus("Error de sincronización");
       toast("Error al cargar estado remoto: " + error.message);
     }
+
+    startPolling(configuredId);
   }
+}
+
+function startPolling(configuredId) {
+  setInterval(async () => {
+    try {
+      const remote = await loadTournamentFromMockApi(configuredId);
+      const remoteTournament = hydrateTournament(remote);
+
+      if (remoteTournament.updatedAt !== tournament.updatedAt) {
+        tournament = remoteTournament;
+        saveLocal();
+        setSyncStatus("Sincronizado");
+        render();
+      }
+    } catch (error) {
+      console.warn("Error checking for updates:", error);
+    }
+  }, 8000);
 }
 
 function loadLocalTournament() {
