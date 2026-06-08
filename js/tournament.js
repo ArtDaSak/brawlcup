@@ -123,6 +123,36 @@ export function removeTeam(tournament, teamId) {
   touch(tournament);
 }
 
+export function updateTeam(tournament, teamId, payload) {
+  const team = tournament.teams.find((t) => t.id === teamId);
+  if (!team) {
+    throw new Error("Equipo no encontrado");
+  }
+
+  const name = payload.name.trim();
+  const memberOne = payload.memberOne.trim();
+  const memberTwo = payload.memberTwo.trim();
+  const notes = payload.notes.trim();
+
+  if (!name || !memberOne || !memberTwo) {
+    throw new Error("El equipo necesita nombre y 2 integrantes");
+  }
+
+  const exists = tournament.teams.some(
+    (t) => t.id !== teamId && t.name.toLowerCase() === name.toLowerCase()
+  );
+
+  if (exists) {
+    throw new Error("Ya existe otro dúo con ese nombre");
+  }
+
+  team.name = name;
+  team.memberOne = memberOne;
+  team.memberTwo = memberTwo;
+  team.notes = notes;
+  touch(tournament);
+}
+
 export function updateRoundSchedule(tournament, roundNumber, field, value) {
   const round = tournament.roundSettings.find(
     (item) => item.number === Number(roundNumber)

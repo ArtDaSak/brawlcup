@@ -1203,4 +1203,50 @@ table tr:hover td {
   animation: tabFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Modos de edición de equipos inline */
+.team-card.editing {
+  display: block;
+  border-color: var(--cyan);
+  background: rgba(0, 242, 254, 0.05);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.edit-form-grid {
+  display: grid;
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.edit-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.edit-form-grid label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.edit-form-grid input {
+  padding: 0.55rem 0.7rem;
+  font-size: 0.85rem;
+  border-radius: 10px;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 0.6rem;
+}
+
 

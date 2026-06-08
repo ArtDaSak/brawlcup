@@ -4,6 +4,7 @@ import {
   hydrateTournament,
   addTeam,
   removeTeam,
+  updateTeam,
   updateRoundSchedule,
   drawRoundOneBye,
   resetRoundOneDraw,
@@ -31,12 +32,16 @@ const REMOTE_ID_KEY = "copa_brawl_sports_duos_remote_id";
 
 let tournament = loadLocalTournament();
 let saveTimer = null;
+let editingTeamId = null;
 
 const $ = (selector) => document.querySelector(selector);
 
 window.App = {
   addTeam: handleAddTeam,
   removeTeam: handleRemoveTeam,
+  startTeamEdit: handleStartTeamEdit,
+  cancelTeamEdit: handleCancelTeamEdit,
+  saveTeamEdit: handleSaveTeamEdit,
   updateRoundSchedule: handleUpdateRoundSchedule,
   updateRoundDateTime: handleUpdateRoundDateTime,
   drawRoundOneBye: handleDrawRoundOneBye,
@@ -150,6 +155,33 @@ function handleRemoveTeam(teamId) {
 
   removeTeam(tournament, teamId);
   commit();
+}
+
+function handleStartTeamEdit(teamId) {
+  editingTeamId = teamId;
+  render();
+}
+
+function handleCancelTeamEdit() {
+  editingTeamId = null;
+  render();
+}
+
+function handleSaveTeamEdit(teamId) {
+  try {
+    const name = $(`#edit-name-${teamId}`).value;
+    const memberOne = $(`#edit-memberOne-${teamId}`).value;
+    const memberTwo = $(`#edit-memberTwo-${teamId}`).value;
+    const notes = $(`#edit-notes-${teamId}`).value;
+
+    updateTeam(tournament, teamId, { name, memberOne, memberTwo, notes });
+
+    editingTeamId = null;
+    commit();
+    toast("Dúo actualizado");
+  } catch (error) {
+    toast(error.message);
+  }
 }
 
 function handleUpdateRoundSchedule(roundNumber, field, value) {
@@ -394,21 +426,68 @@ function renderTeams() {
 
   container.innerHTML = tournament.teams
     .map(
-      (team, index) => `
-      <article class="team-card">
-        <div>
-          <strong>${index + 1}. ${escapeHtml(team.name)}</strong>
-          <small>
-            ${escapeHtml(team.memberOne)} + ${escapeHtml(team.memberTwo)}
-            ${team.notes ? ` · ${escapeHtml(team.notes)}` : ""}
-          </small>
-        </div>
+      (team, index) => {
+        if (team.id === editingTeamId) {
+          return `
+            <article class="team-card editing">
+              <div class="edit-form-grid">
+                <div style="font-weight: 900; font-size: 0.95rem; color: var(--cyan); margin-bottom: 0.25rem;">
+                  Editar Dúo #${index + 1}
+                </div>
+                <div class="edit-form-row">
+                  <label>
+                    Nombre del dúo
+                    <input id="edit-name-${team.id}" value="${escapeHtml(team.name)}">
+                  </label>
+                  <label>
+                    Notas / contacto
+                    <input id="edit-notes-${team.id}" value="${escapeHtml(team.notes || '')}">
+                  </label>
+                </div>
+                <div class="edit-form-row">
+                  <label>
+                    Integrante 1
+                    <input id="edit-memberOne-${team.id}" value="${escapeHtml(team.memberOne)}">
+                  </label>
+                  <label>
+                    Integrante 2
+                    <input id="edit-memberTwo-${team.id}" value="${escapeHtml(team.memberTwo)}">
+                  </label>
+                </div>
+                <div class="edit-actions">
+                  <button class="ghost small" onclick="App.cancelTeamEdit()">
+                    Cancelar
+                  </button>
+                  <button class="small" onclick="App.saveTeamEdit('${team.id}')" style="background: var(--cyan); color: #000; border-color: var(--cyan);">
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            </article>
+          `;
+        }
 
-        <button class="ghost small" onclick="App.removeTeam('${team.id}')">
-          Eliminar
-        </button>
-      </article>
-    `
+        return `
+          <article class="team-card">
+            <div>
+              <strong>${index + 1}. ${escapeHtml(team.name)}</strong>
+              <small>
+                ${escapeHtml(team.memberOne)} + ${escapeHtml(team.memberTwo)}
+                ${team.notes ? ` · ${escapeHtml(team.notes)}` : ""}
+              </small>
+            </div>
+
+            <div class="actions">
+              <button class="ghost small" onclick="App.startTeamEdit('${team.id}')">
+                Editar
+              </button>
+              <button class="ghost small" onclick="App.removeTeam('${team.id}')">
+                Eliminar
+              </button>
+            </div>
+          </article>
+        `;
+      }
     )
     .join("");
 }
