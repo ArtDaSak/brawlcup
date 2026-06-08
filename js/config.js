@@ -5,7 +5,7 @@ export const CONFIG = {
 
   // Opcional:
   // Si dejas esto vacío, puedes crear o cargar el torneo desde la interfaz
-  TOURNAMENT_ID: "",
+  TOURNAMENT_ID: "1",
 
   AUTO_SAVE_TO_MOCKAPI: true
 };
